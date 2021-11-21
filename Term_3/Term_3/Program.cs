@@ -6,39 +6,56 @@ namespace Term_3
     {
         static void Main(string[] args)
         {
-            // Создать две коллекции StudentCollection<string> с разными названиями
-            KeySelector<String> selector = delegate (Student student)
-            {
-                return student.GetHashCode().ToString();
-            };
-            StudentCollection<string> studentCollection1 = new StudentCollection<string>(selector);
-            studentCollection1.CollectionName = "Student Collection 1";
-            StudentCollection<string> studentCollection2 = new StudentCollection<string>(selector);
-            studentCollection2.CollectionName = "Student Collection 2";
-
-            Student st1 = new Student();
-            Student st2 = new Student(new Person("Anna", "Fischer", new DateTime(1998, 6, 6)), Education.Specialist, 155);
-            Student st3 = new Student(new Person("Holly", "Weber", new DateTime(1999, 7, 7)), Education.Вachelor, 156);
-            Student st4 = new Student(new Person("Emily", "Meyer", new DateTime(2000, 8, 8)), Education.SecondEducation, 157);
-
-            //  Создать объект Journal и подписать его на события StudentsChanged из обеих коллекций StudentCollection<string>
-            Journal journal = new Journal();
-            studentCollection1.StudentsChanged = journal.JournalEntryHandler;
-            studentCollection2.StudentsChanged = journal.JournalEntryHandler;
-            //st1.PropertyChanged += journal.JournalEntryHandler;
-            //st2.PropertyChanged += journal.JournalEntryHandler;
-            // добавить элементы Student в коллекции
-            studentCollection1.AddStudents(st1, st3);
-            studentCollection2.AddStudents(st2, st4);
-            // изменить значения разных свойств элементов, входящих в коллекцию
-            st1.StudentEducat = Education.SecondEducation;
-            st2.Group = 150;
-            // удалить элемент из коллекции
-            studentCollection1.Remove(st1);
-            // изменить данные в удаленном элементе
-            st1.Group = 154;
-            // Вывести данные объекта Journal
-            Console.WriteLine(journal);
-         }
+            //  Создать объект типа T с непустым списком элементов, для которого
+            //предусмотрен ввод данных с консоли.Создать полную копию объекта с
+            //помощью метода, использующего сериализацию, и вывести исходный
+            //объект и его копию.
+            Console.WriteLine("-----------------1ST ASSIGNMENT-----------------");
+            Student firststudent = new Student(new Person("Masha", "Petrova", new DateTime(2001, 5, 5)), Education.Вachelor, 111);
+            Exam[] exams = new Exam[3];
+            exams[0] = new Exam("English", 4, new DateTime(2021, 9, 4));
+            exams[1] = new Exam("Chemistry", 3, new DateTime(2021, 9, 7));
+            exams[2] = new Exam("C#", 5, new DateTime(2021, 9, 19));
+            firststudent.AddExams(exams);
+            Student secondstudent = new Student();
+            secondstudent = (Student)firststudent.TDeepCopy();
+            Console.WriteLine("First student: ");
+            Console.WriteLine(firststudent.ToString());
+            Console.WriteLine("Second student: ");
+            Console.WriteLine(secondstudent.ToString());
+            Console.WriteLine("-----------------2ND ASSIGNMENT-----------------");
+            /**
+             *  Предложить пользователю ввести имя файла:
+                если файла с введенным именем нет, приложение должно 
+                сообщить об этом и создать файл;
+                если файл существует, вызвать метод Load(string filename) для 
+                инициализации объекта T данными из файла. 
+            **/
+            Console.WriteLine("Enter file name (students.bin)");
+            string filename = Console.ReadLine();
+            secondstudent.Load(filename);
+            Console.WriteLine("-----------------3RD ASSIGNMENT-----------------");
+            //Вывести объект
+            Console.WriteLine("Loaded student:");
+            Console.WriteLine(secondstudent.ToString());
+            Console.WriteLine("-----------------4TH ASSIGNMENT-----------------");
+            //Для этого же объекта T сначала вызвать метод AddFromConsole(), затем 
+            //метод Save(string filename). Вывести объект T.
+            secondstudent.AddFromConsole();
+            secondstudent.Save(filename);
+            Console.WriteLine("Saved student:");
+            Console.WriteLine(secondstudent.ToString());
+            Console.WriteLine("-----------------5TH ASSIGNMENT-----------------");
+            /**Вызвать последовательно 
+                статический метод Load( string filename, T obj), передав как параметры ссылку на тот же самый объект T и введенное ранее имя файла;
+                метод AddFromConsole();
+                статический метод Save (string filename, T obj).
+                Вывести объект T.
+            **/
+            Student.Load(filename, firststudent);
+            firststudent.AddFromConsole();
+            Student.Save(filename, firststudent);
+            Console.WriteLine(firststudent.ToString());
+        }
     }
 }

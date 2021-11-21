@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Term_3
 {
+    [Serializable]
     public class Test : IDateAndCopy
     {
         public string subject_name;

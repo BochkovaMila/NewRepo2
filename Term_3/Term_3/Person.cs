@@ -4,7 +4,8 @@ using System.Text;
 
 namespace Term_3
 {
-    public class Person: IDateAndCopy
+    [Serializable]
+    public class Person
     {
         protected string name;
         protected string surname;
@@ -61,7 +62,7 @@ namespace Term_3
             }
         }
 
-        public DateTime Date { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //public DateTime Date { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public override string ToString() //формирование строки со значениями всех полей класса
         {

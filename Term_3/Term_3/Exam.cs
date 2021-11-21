@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Term_3
 {
+    [Serializable]
     public class Exam : IDateAndCopy, IComparable, IComparer<Exam>
     {
         public string Subject;

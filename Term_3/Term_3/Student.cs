@@ -2,11 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 
 namespace Term_3
 {
-    public class Student : Person, IDateAndCopy, INotifyPropertyChanged
+    [Serializable]
+    public class Student : Person, INotifyPropertyChanged
     {
         private Education educat;
         private int group;
@@ -167,6 +170,144 @@ namespace Term_3
             foreach(var ex in examstaken)
             {
                 Console.WriteLine(ex.ToString());
+            }
+        }
+        public object TDeepCopy() //для создания полной копии объекта с использованием сериализации
+        {
+            MemoryStream ms = new MemoryStream();
+            try
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(ms, this);
+                ms.Position = 0;
+                return formatter.Deserialize(ms);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new Student();
+            }
+            finally
+            {
+                ms?.Close();
+            }
+        }
+        public bool Save(string filename) //для сохранения данных объекта в файле с помощью сериализации
+        {
+            try
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
+                {
+                    formatter.Serialize(fs, this);
+                }
+                return true;
+            }
+            catch
+            {
+                Console.WriteLine("Save to file " + filename + " failed");
+                return false;
+            }
+            finally
+            {
+                Console.WriteLine("Finished saving");
+            }
+        }
+        public bool Load(string filename) //для инициализации объекта данными из файла с помощью десериализации
+        {
+            try
+            {
+                Student student;
+                BinaryFormatter formatter = new BinaryFormatter();
+                using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
+                {
+                    student = (Student)formatter.Deserialize(fs);
+                }
+                educat = student.StudentEducat;
+                group = student.Group;
+                examstaken = new List<Exam>(student.examstaken); 
+                tests = new List<Test>(student.tests); 
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                Console.WriteLine("Finished loading");
+            }
+        }
+        public bool AddFromConsole() // для добавления в один из списков класса нового элемента, данные для которого вводятся с консоли
+        {
+            Console.Write("Enter exam info in format:\nSubject, Grade, Exam Date (year month day) \nusing these separators '-' ' ' ',' ';'\n");
+            string output = Console.ReadLine();
+            string[] results = output.Split('-', ' ', ';', ',');
+            if (results.Length != 5)
+            {
+                Console.WriteLine("Invalid input");
+                return false;
+            }
+            else
+            {
+                try
+                {
+                    Exam exam = new Exam();
+                    exam.Subject = results[0];
+                    exam.Grade = Int32.Parse(results[1]);
+                    exam.ExamDate = new DateTime(Int32.Parse(results[2]), Int32.Parse(results[3]), Int32.Parse(results[4]));
+                    this.AddExams(exam);
+                    return true;
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return false;
+                }
+            }
+        }
+        public static bool Save(string filename, Student obj) // для сохранения объекта в файле с помощью сериализации
+        {
+            try
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
+                {
+                    formatter.Serialize(fs, obj);
+                }
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                Console.WriteLine("Finished static saving");
+            }
+        }
+        public static bool Load(string filename, Student obj) //для восстановления объекта из файла с помощью десериализации
+        {
+            try
+            {
+                Student student;
+                BinaryFormatter formatter = new BinaryFormatter();
+                using (FileStream fs = new FileStream(filename, FileMode.Open))
+                {
+                    student = (Student)formatter.Deserialize(fs);
+                }
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                Console.WriteLine("Finished static loading");
             }
         }
         public void SortExamsBySubject() //по названию предмета
